@@ -1,0 +1,31 @@
+name: Hello World
+description: sign JWT for Anypoint Platform Connected App
+
+inputs:
+  anypoint_connapp_client_id:
+    description: clientId of Connected App
+    required: true
+  anypoint_identity_provider_id:
+    description: aaa
+    required: true
+  anypoint_user_name:
+    description: aaa
+    required: true
+  anypoint_token_endpoint_url:
+    description: aaa
+    required: true
+  private_key_pem:
+    description: aaa
+    required: true
+  expiration_time:
+    description: aaa
+    required: true
+    default: "1h"
+
+outputs:
+  json_web_token:
+    description: aaa
+
+runs:
+  using: node20
+  main: index.js

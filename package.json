@@ -1,0 +1,17 @@
+{
+  "name": "mulesoft-connected-app-jtw-signer",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "shimiz98",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "jose": "^6.0.12"
+  },
+  "type": "module"
+}
