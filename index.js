@@ -47,15 +47,21 @@ try {
         })
     });
     if (!httpResponse.ok) {
-        throw new Error(`httpStatus=${httpResponse.status} url=${anypointTokenEndpointUrl}`);
+        const errorSummury=`httpStatus=${httpResponse.status} url=${anypointTokenEndpointUrl}`
+        core.error(errorSummury);
+        core.error('response body=');
+        core.error(await httpResponse.text());
+        throw new Error(errorSummury);
     }
     const httpResponseBody = await httpResponse.json();
     const anypoint_access_token = httpResponseBody['access_token'];
     core.setSecret(anypoint_access_token) // これはGitHub Secretsへの設定ではなく、マスク(伏字)する設定
     core.info(`Anypoint Platformから払い出されたaccess_tokenの文字数=${anypoint_access_token.length}`);
+    core.info(`Anypoint Platformから払い出されたexpires_in=${httpResponseBody['expires_in']}`);
     core.setOutput('anypoint_access_token', anypoint_access_token);
     core.info('=== end mulesoft-connected-app-jtw-signer ===');
 } catch (error) {
+    // TODO fetch()で接続エラーのエラーメッセージが「fetch failed」のみなのを、詳細出力する
     core.setFailed(error.message);
 }
 
