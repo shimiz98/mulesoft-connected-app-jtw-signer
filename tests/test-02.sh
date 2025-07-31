@@ -7,7 +7,7 @@ export INPUT_anypoint_identity_provider_id=mulesoft
 export INPUT_anypoint_user_name=dec21064-2506
 export INPUT_anypoint_token_endpoint_url=https://anypoint.mulesoft.com/accounts/api/v2/oauth2/token
 export INPUT_private_key_pem="$INPUT_private_key_pem"
-export INPUT_expiration_time=99h
+export INPUT_expiration_time=3m
 
 # 実行
 node ./index.js

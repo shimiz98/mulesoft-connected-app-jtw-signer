@@ -18,9 +18,9 @@ inputs:
     description: aaa
     required: true
   expiration_time:
-    description: aaa
+    description: JWTの有効時間。これを3分にしても、Anypoint Platformから払い出されたアクセストークンの有効時間は3600秒だったので、もっと短くて良いかも。
     required: true
-    default: "1h"
+    default: "3m"
 
 outputs:
   json_web_token:
