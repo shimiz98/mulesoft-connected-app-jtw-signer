@@ -25,6 +25,8 @@ inputs:
 outputs:
   json_web_token:
     description: aaa
+  anypoint_access_token:
+    description: Anypoint Platformから払い出されたアクセストークン(access_token)
 
 runs:
   using: node20

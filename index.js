@@ -17,10 +17,11 @@ try {
     const anypointConnAppClientId = core.getInput('anypoint_connapp_client_id', { required: true});
     const anypointIdProviderId = core.getInput('anypoint_identity_provider_id', { required: true});
     const anypointUserName = core.getInput('anypoint_user_name', { required: true});
-    const anypointAudience = core.getInput('anypoint_token_endpoint_url', { required: true});
+    const anypointTokenEndpointUrl = core.getInput('anypoint_token_endpoint_url', { required: true});
     const privateKeyPem = core.getInput('private_key_pem', { required: true});
     const expirationTime = core.getInput('expiration_time', { required: true});
 
+    // --- JWTを生成 ---
     const alg = 'RS256'
     const privateKey = await jose.importPKCS8(privateKeyPem, alg)
     const jwt = await new jose.SignJWT({ 'urn:example:claim': true })
@@ -28,12 +29,37 @@ try {
         .setIssuedAt()
         .setIssuer(anypointConnAppClientId)
         .setSubject("v2|" + anypointIdProviderId + "|" + anypointUserName)
-        .setAudience(anypointAudience)
+        .setAudience(anypointTokenEndpointUrl)
         .setExpirationTime(expirationTime)
         .sign(privateKey)
     core.setOutput('json_web_token', jwt);
     core.info(`JWTの文字数=${jwt.length} ※JWTは自動的に伏字になる https://docs.github.com/ja/actions/reference/secrets-reference#automatically-redacted-secrets`)
+
+    // --- JWTを用いてAnypoint Platformのアクセストークンを取得 ---
+    const httpResponse = await fetch(anypointTokenEndpointUrl, {
+        method: "POST",
+        headers: {
+            "content-type": "application/json"
+        },
+        body: JSON.stringify({
+            "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer", 
+            "assertion": jwt
+        })
+    });
+    if (!httpResponse.ok) {
+        throw new Error(`httpStatus=${httpResponse.status} url=${anypointTokenEndpointUrl}`);
+    }
+    const httpResponseBody = await httpResponse.json();
+    const anypoint_access_token = httpResponseBody['access_token'];
+    core.setSecret(anypoint_access_token) // これはGitHub Secretsへの設定ではなく、マスク(伏字)する設定
+    core.info(`Anypoint Platformから払い出されたaccess_tokenの文字数=${anypoint_access_token.length}`);
+    core.setOutput('anypoint_access_token', anypoint_access_token);
     core.info('=== end mulesoft-connected-app-jtw-signer ===');
 } catch (error) {
     core.setFailed(error.message);
 }
+
+
+// TODO 以下を参考にアクセストークンを無効化(revoke)する処理を追加する
+// https://github.com/actions/checkout/blob/main/src/state-helper.ts
+// https://anypoint.mulesoft.com/accounts/api/v2/oauth2/revoke
