@@ -22,8 +22,8 @@ try {
     const expirationTime = core.getInput('expiration_time', { required: true});
 
     // --- JWTを生成 ---
-    const alg = 'RS256'
-    const privateKey = await jose.importPKCS8(privateKeyPem, alg)
+    const alg = 'RS256';
+    const privateKey = await jose.importPKCS8(privateKeyPem, alg);
     const jwt = await new jose.SignJWT({ 'urn:example:claim': true })
         .setProtectedHeader({ alg })
         .setIssuedAt()
@@ -31,9 +31,9 @@ try {
         .setSubject("v2|" + anypointIdProviderId + "|" + anypointUserName)
         .setAudience(anypointTokenEndpointUrl)
         .setExpirationTime(expirationTime)
-        .sign(privateKey)
+        .sign(privateKey);
     core.setOutput('json_web_token', jwt);
-    core.info(`JWTの文字数=${jwt.length} ※JWTは自動的に伏字になる https://docs.github.com/ja/actions/reference/secrets-reference#automatically-redacted-secrets`)
+    core.info(`JWTの文字数=${jwt.length} ※JWTは自動的に伏字になる https://docs.github.com/ja/actions/reference/secrets-reference#automatically-redacted-secrets`);
 
     // --- JWTを用いてAnypoint Platformのアクセストークンを取得 ---
     const httpResponse = await fetch(anypointTokenEndpointUrl, {
@@ -55,7 +55,7 @@ try {
     }
     const httpResponseBody = await httpResponse.json();
     const anypoint_access_token = httpResponseBody['access_token'];
-    core.setSecret(anypoint_access_token) // これはGitHub Secretsへの設定ではなく、マスク(伏字)する設定
+    core.setSecret(anypoint_access_token); // これはGitHub Secretsへの設定ではなく、マスク(伏字)する設定
     core.info(`Anypoint Platformから払い出されたaccess_tokenの文字数=${anypoint_access_token.length}`);
     core.info(`Anypoint Platformから払い出されたexpires_in=${httpResponseBody['expires_in']}`);
     core.setOutput('anypoint_access_token', anypoint_access_token);
